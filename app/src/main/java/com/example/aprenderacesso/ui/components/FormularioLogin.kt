@@ -140,7 +140,6 @@ fun FormularioLogin(
                 }}) {
                     Text("Entrar")
                 }
-
             }
         }
     }
