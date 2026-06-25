@@ -1,10 +1,13 @@
 package com.example.aprenderacesso.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -28,6 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -35,6 +39,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.aprenderacesso.navigation.Routes
 import com.example.aprenderacesso.ui.theme.Typography
 import com.example.aprenderacesso.validation.FormState
 import com.example.aprenderacesso.validation.validateEmail
@@ -43,6 +51,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun FormularioLogin(
+    navController: NavController,
     state: FormState,
     valorEmailChange: (String) -> Unit,
     valorSenhaChange: (String) -> Unit,
@@ -52,7 +61,6 @@ fun FormularioLogin(
     var senhaVisivel by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-
 
     Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { innerPadding->
         Column(modifier.fillMaxWidth().padding(innerPadding), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -79,7 +87,6 @@ fun FormularioLogin(
                     }
                 }
             )
-
             OutlinedTextField(
                 value = state.password,
                 onValueChange = valorSenhaChange,
@@ -133,17 +140,33 @@ fun FormularioLogin(
                 horizontalAlignment = Alignment.CenterHorizontally
             )
             {
-                Button(onClick =  {if(validateEmail(state.email).isValid && validatePassword(state.password).isValid)
-                    scope.launch { snackbarHostState.showSnackbar("Login validado com sucesso") }
-                else {
-                    scope.launch { snackbarHostState.showSnackbar("Dados de login inválidos") }
-                }}) {
+                Text(
+                    modifier = modifier.clickable(onClick = { navController.navigate(Routes.CADASTRO) }),
+                    text = "Criar conta",
+                    color = Color.Blue
+                )
+            }
+            Row() {
+                Button(onClick = {
+                    if (validateEmail(state.email).isValid && validatePassword(state.password).isValid)
+                        scope.launch { snackbarHostState.showSnackbar("Login validado com sucesso") }
+                    else {
+                        scope.launch { snackbarHostState.showSnackbar("Dados de login inválidos") }
+                    }
+                }) {
                     Text("Entrar")
+                }
+
+                Spacer(modifier = modifier.width(8.dp))
+
+                Button(onClick = {}) {
+                    Text("Cancelar")
                 }
             }
         }
     }
 }
+
 
 @Composable
 @Preview (showBackground = true)
@@ -151,8 +174,10 @@ fun FormularioLoginPreview() {
 
     var valorEmail by remember { mutableStateOf("") }
     var valorSenha by remember { mutableStateOf("") }
+    val navController = rememberNavController()
 
     FormularioLogin(
+        navController = navController,
         state = FormState(
             email = valorEmail,
             password = valorSenha
@@ -160,5 +185,4 @@ fun FormularioLoginPreview() {
         valorEmailChange = { valorEmail = it },
         valorSenhaChange = { valorSenha = it }
     )
-
 }
