@@ -1,10 +1,13 @@
 package com.example.aprenderacesso.validation
 
 data class FormState(
-    val name: String = "",
     val email: String = "",
     val password: String = "",
     val confirmPassword: String = "",
+    val nameCadastro: String = "",
+    val emailCadastro: String = "",
+    val passwordCadastro: String = "",
+    val confirmPasswordCadastro: String = "",
     val acceptedTerms: Boolean = false,
     val passwordVisible: Boolean = false,
     val confirmPasswordVisible: Boolean = false,
