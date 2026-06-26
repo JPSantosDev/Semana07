@@ -1,5 +1,6 @@
 package com.example.aprenderacesso.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,9 +24,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.aprenderacesso.navigation.Routes
 import com.example.aprenderacesso.validation.FormState
 import com.example.aprenderacesso.validation.validateConfirmPassword
 import com.example.aprenderacesso.validation.validateEmail
@@ -107,12 +110,25 @@ fun FormularioCadastro(
                     checked = termosCheck,
                     onCheckedChange = {termosCheck = !termosCheck},
                 )
-                Text("Aceito os termos de uso")
+                Text(text = "Aceito os termos de uso")
             }
-        }
-        Row(modifier = modifier.fillMaxWidth()) {
-            Button(onClick = {}) {
-                Text("Cadastrar")
+            Row(modifier = modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center) {
+                Button(onClick = {}) {
+                    Text("Cadastrar")
+                }
+                Button(onClick = {}) {
+                    Text("Cancelar")
+                }
+            }
+            Column(modifier = modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "Já tenho conta",
+                    modifier = modifier
+                        .clickable(onClick = {navController.navigate(Routes.LOGIN)}),
+                    color = Color.Blue
+                )
             }
         }
     }
