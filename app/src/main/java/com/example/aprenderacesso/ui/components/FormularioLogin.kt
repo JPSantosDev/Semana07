@@ -19,7 +19,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -34,19 +33,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.aprenderacesso.navigation.Routes
 import com.example.aprenderacesso.ui.theme.Typography
-import com.example.aprenderacesso.validation.FormState
-import com.example.aprenderacesso.validation.validateEmail
-import com.example.aprenderacesso.validation.validatePassword
+import com.example.aprenderacesso.ui.state.FormState
+import com.example.aprenderacesso.validation.Validations
 import kotlinx.coroutines.launch
 
 @Composable
@@ -55,7 +50,8 @@ fun FormularioLogin(
     state: FormState,
     valorEmailChange: (String) -> Unit,
     valorSenhaChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    validations: Validations
 ) {
     var check by remember { mutableStateOf(false) }
     var senhaVisivel by remember { mutableStateOf(false) }
@@ -73,11 +69,11 @@ fun FormularioLogin(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email
                 ),
-                isError = !validateEmail(state.email).isValid,
+                isError = !validations.validateEmail(state.email).isValid,
                 supportingText = {
-                    if (!validateEmail(state.email).isValid) {
+                    if (!validations.validateEmail(state.email).isValid) {
                         Text(
-                            text = validateEmail(state.email).message ?: "",
+                            text = validations.validateEmail(state.email).message ?: "",
                             style = Typography.bodySmall,
                             color = MaterialTheme.colorScheme.error,
                             textAlign = TextAlign.Start
@@ -96,11 +92,11 @@ fun FormularioLogin(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password
                 ),
-                isError = !validatePassword(state.password).isValid,
+                isError = !validations.validatePassword(state.password).isValid,
                 supportingText = {
-                    if (!validatePassword(state.password).isValid) {
+                    if (!validations.validatePassword(state.password).isValid) {
                         Text(
-                            text = validatePassword(state.password).message ?: "",
+                            text = validations.validatePassword(state.password).message ?: "",
                             style = Typography.bodySmall,
                             color = MaterialTheme.colorScheme.error,
                             textAlign = TextAlign.Start
@@ -141,14 +137,14 @@ fun FormularioLogin(
             )
             {
                 Text(
-                    modifier = modifier.clickable(onClick = { navController.navigate(Routes.CADASTRO) }),
+                    modifier = modifier.clickable(onClick = { state.loginMode = false }),
                     text = "Criar conta",
                     color = Color.Blue
                 )
             }
             Row() {
                 Button(onClick = {
-                    if (validateEmail(state.email).isValid && validatePassword(state.password).isValid)
+                    if (validations.validateEmail(state.email).isValid && validations.validatePassword(state.password).isValid)
                         scope.launch { snackbarHostState.showSnackbar("Login validado com sucesso") }
                     else {
                         scope.launch { snackbarHostState.showSnackbar("Dados de login inválidos") }
@@ -172,6 +168,8 @@ fun FormularioLogin(
 @Preview (showBackground = true)
 fun FormularioLoginPreview() {
 
+    val validations = Validations()
+
     var valorEmail by remember { mutableStateOf("") }
     var valorSenha by remember { mutableStateOf("") }
     val navController = rememberNavController()
@@ -183,6 +181,8 @@ fun FormularioLoginPreview() {
             password = valorSenha
         ),
         valorEmailChange = { valorEmail = it },
-        valorSenhaChange = { valorSenha = it }
+        valorSenhaChange = { valorSenha = it },
+        validations = validations
+
     )
 }

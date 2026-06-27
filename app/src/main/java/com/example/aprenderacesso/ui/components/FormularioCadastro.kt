@@ -1,6 +1,5 @@
 package com.example.aprenderacesso.ui.components
 
-import android.inputmethodservice.Keyboard
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -37,18 +35,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.aprenderacesso.navigation.Routes
 import com.example.aprenderacesso.ui.theme.Typography
-import com.example.aprenderacesso.validation.FormState
-import com.example.aprenderacesso.validation.validateConfirmPassword
-import com.example.aprenderacesso.validation.validateEmail
-import com.example.aprenderacesso.validation.validateName
-import com.example.aprenderacesso.validation.validatePassword
+import com.example.aprenderacesso.ui.state.FormState
+import com.example.aprenderacesso.validation.Validations
 
 @Composable
 fun FormularioCadastro(
     navController: NavController,
     state: FormState,
+    validations: Validations,
     modifier: Modifier = Modifier,
     valorEmailChange: (String)-> Unit,
     valorPasswordChange: (String) -> Unit,
@@ -65,12 +60,12 @@ fun FormularioCadastro(
             horizontalAlignment = Alignment.CenterHorizontally) {
 
             OutlinedTextField(
-                value = state.nameCadastro,
+                value = state.name,
                 onValueChange = valorEmailChange,
                 placeholder = { Text("Coloque seu nome") },
                 label = {Text("Nome & Sobrenome")},
                 singleLine = true,
-                isError = !validateName(state.nameCadastro).isValid,
+                isError = !validations.validateName(state.name).isValid,
                 trailingIcon = { Icon(
                     imageVector = Icons.Default.AccountCircle,
                     contentDescription = "Nome"
@@ -80,18 +75,18 @@ fun FormularioCadastro(
                 ),
                 supportingText = {
                     Text(
-                       text = validateName(state.nameCadastro).message ?: ""
+                       text = validations.validateName(state.name).message ?: ""
                     )
                 }
             )
 
             OutlinedTextField(
-                value = state.emailCadastro,
+                value = state.email,
                 onValueChange = valorEmailChange,
                 placeholder = { Text("Coloque seu email") },
                 label = {Text("Email")},
                 singleLine = true,
-                isError = !validateEmail(state.emailCadastro).isValid,
+                isError = !validations.validateEmail(state.email).isValid,
                 trailingIcon = { Icon(
                     imageVector = Icons.Default.Email,
                     contentDescription = "Email"
@@ -101,18 +96,18 @@ fun FormularioCadastro(
                 ),
                 supportingText = {
                     Text(
-                        text = validateEmail(state.emailCadastro).message ?: ""
+                        text = validations.validateEmail(state.email).message ?: ""
                     )
                 }
             )
 
             OutlinedTextField(
-                value = state.passwordCadastro,
+                value = state.password,
                 onValueChange = valorPasswordChange,
                 placeholder = { Text("Coloque sua senha") },
                 label = {Text("Senha")},
                 singleLine = true,
-                isError = !validatePassword(state.passwordCadastro).isValid,
+                isError = !validations.validatePassword(state.password).isValid,
                 trailingIcon = { IconButton(onClick = { senhaVisivel = !senhaVisivel }) { Icon(
                     imageVector = if(senhaVisivel) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                     contentDescription = if (senhaVisivel) "Ocultar senha" else "Mostrar senha"
@@ -122,7 +117,7 @@ fun FormularioCadastro(
                 ),
                 supportingText = {
                     Text(
-                        text = validatePassword(state.passwordCadastro).message ?: ""
+                        text = validations.validatePassword(state.password).message ?: ""
                     )
                 }
 
@@ -130,15 +125,15 @@ fun FormularioCadastro(
             )
 
             OutlinedTextField(
-                value = state.passwordCadastro,
+                value = state.password,
                 onValueChange = valorPasswordConfirmChange,
                 placeholder = { Text("Confirme sua senha") },
                 label = {Text("Confirme a senha")},
                 singleLine = true,
-                isError = !validateConfirmPassword(state.confirmPasswordCadastro,state.passwordCadastro).isValid,
-                supportingText = {if(!validateConfirmPassword(state.confirmPassword,state.confirmPasswordCadastro).isValid){
+                isError = !validations.validateConfirmPassword(state.confirmPassword,state.password).isValid,
+                supportingText = {if(!validations.validateConfirmPassword(state.confirmPassword,state.password).isValid){
                     Text(
-                        text = validateConfirmPassword(state.confirmPasswordCadastro,state.passwordCadastro).message ?: "",
+                        text = validations.validateConfirmPassword(state.confirmPassword,state.password).message ?: "",
                         style = Typography.bodySmall,
                         color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Start
@@ -179,7 +174,7 @@ fun FormularioCadastro(
                 Text(
                     text = "Já tenho conta",
                     modifier = modifier
-                        .clickable(onClick = {navController.navigate(Routes.LOGIN)}),
+                        .clickable(onClick = {state.copy(loginMode = true) }),
                     color = Color.Blue
                 )
             }
@@ -199,14 +194,15 @@ fun Preview(){
     FormularioCadastro(
         navController = navController,
         state = FormState(
-            emailCadastro = valorEmail,
-            passwordCadastro = valorSenha,
-            confirmPasswordCadastro = valorConfirmSenha
+            email = valorEmail,
+            password = valorSenha,
+            confirmPassword = valorConfirmSenha
 
         ),
         valorEmailChange = {valorEmail = it},
         valorPasswordChange = {valorEmail = it},
-        valorPasswordConfirmChange = {valorConfirmSenha = it}
+        valorPasswordConfirmChange = {valorConfirmSenha = it},
+        validations = Validations
 
     )
 }
